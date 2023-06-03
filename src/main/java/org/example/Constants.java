@@ -7,7 +7,7 @@ public class Constants {
     public static final int MARGIN_FROM_TOP = 5;
     public static final int MARGIN_FROM_LEFT = 10;
     public static final int MANAGE_ACTIVITIES_WINDOW_WIDTH = 400;
-    public static final int MANAGE_ACTIVITIES_WINDOW_HEIGHT = 500;
+    public static final int MANAGE_ACTIVITIES_WINDOW_HEIGHT = 400;
     public static final int DONE_BUTTON_WIDTH = 80;
     public static final int DONE_BUTTON_HEIGHT = 30;
     public static final int INVALID_FINAL_CHECKS_LABEL_WIDTH = 200;

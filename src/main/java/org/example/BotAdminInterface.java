@@ -5,8 +5,11 @@ import java.util.ArrayList;
 public class BotAdminInterface extends JFrame{
     private ArrayList<String> activities;
     public BotAdminInterface() {
-        System.out.println("im here");
-        this.setSize(500,500);
+        this.setSize(700,700);
+        this.setLayout(null);
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        this.setTitle("Bot Admin Interface");
         this.setVisible(true);
     }
 

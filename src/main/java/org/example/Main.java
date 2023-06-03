@@ -7,11 +7,11 @@ public class Main {
     public static void main(String[] args) {
         new ManageActivitiesWindow();
 
-//        try {
-//            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-//            botsApi.registerBot(new WorldDataBot());
-//        } catch (TelegramApiException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(new WorldDataBot());
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

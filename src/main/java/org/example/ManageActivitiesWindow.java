@@ -60,6 +60,7 @@ public class ManageActivitiesWindow extends JFrame {
         doneButton.addActionListener(e -> {
             if (checkActivitiesFinalChecks()) {
                 botAdminInterface = new BotAdminInterface();
+                botAdminInterface.setActivities(activities);
             }
         });
 
@@ -79,13 +80,11 @@ public class ManageActivitiesWindow extends JFrame {
             this.selectedActivities--;
             activities.remove(newActivity);
         }
-        System.out.println(this.selectedActivities);
     }
 
     private boolean checkActivitiesFinalChecks() {
         boolean result = false;
         if (this.selectedActivities <= 3 && this.selectedActivities!=0)  {
-            botAdminInterface.setActivities(activities);
             result = true;
         } else {
             if (selectedActivities == 0) {

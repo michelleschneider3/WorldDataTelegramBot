@@ -1,5 +1,4 @@
 package org.example;
-
 public class Constants {
     public static final String BOT_USER_NAME = "WorldDataBot";
     public static final String BOT_TOKEN = "5916599638:AAFcHKKGlF6cjqF0iYujl6-7nZmQHEKw1SI";

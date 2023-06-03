@@ -2,21 +2,17 @@ package org.example;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-public class ManageActivitiesWindow extends JFrame {
+public class ManageActivitiesPanel extends JPanel {
     private BotAdminInterface botAdminInterface;
     private int selectedActivities;
     private JLabel invalidChecksLabel;
-    private ArrayList<String> activities;
-    public ManageActivitiesWindow () {
-        this.setSize(Constants.MANAGE_ACTIVITIES_WINDOW_WIDTH,Constants.MANAGE_ACTIVITIES_WINDOW_HEIGHT);
+    private ArrayList<String> availableActivities;
+    public ManageActivitiesPanel() {
+        this.setSize(Constants.MANAGE_ACTIVITIES_WINDOW_WIDTH/2,Constants.MANAGE_ACTIVITIES_WINDOW_HEIGHT/2);
         this.setLayout(null);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLocationRelativeTo(null);
-        this.setResizable(false);
-        this.setTitle("WorldDataBot Admin Interface");
 
-        selectedActivities = 0;
-        activities = new ArrayList<>();
+        this.selectedActivities = 0;
+        availableActivities = new ArrayList<>();
 
         JLabel directiveLabel = new JLabel("Choose at most 3 activities: ");
         directiveLabel.setBounds(Constants.MARGIN_FROM_LEFT,0,Constants.DIRECTIVE_LABEL_WIDTH, Constants.DIRECTIVE_LABEL_HEIGHT);
@@ -61,22 +57,21 @@ public class ManageActivitiesWindow extends JFrame {
         this.add(activity5CheckBox);
         activity5CheckBox.addActionListener(e -> updateSelectedActivities(activity5CheckBox.isSelected(), activity5CheckBox));
 
-        JButton doneButton = new JButton("Done");
-        doneButton.setFocusable(false);
-        doneButton.setBounds((Constants.MANAGE_ACTIVITIES_WINDOW_WIDTH-Constants.DONE_BUTTON_WIDTH)/2, activity5CheckBox.getY() + Constants.CHECK_BOX_HEIGHT + Constants.MARGIN_FROM_TOP, Constants.DONE_BUTTON_WIDTH, Constants.DONE_BUTTON_HEIGHT);
-        Font doneButtonFont = new Font("Comic Sans MS", Font.BOLD, 14);
-        doneButton.setFont(doneButtonFont);
-        this.add(doneButton);
-        doneButton.addActionListener(e -> {
+        JButton updateActivitiesButton = new JButton("Update Activities");
+        updateActivitiesButton.setFocusable(false);
+        updateActivitiesButton.setBounds((Constants.MANAGE_ACTIVITIES_WINDOW_WIDTH/2-Constants.UPDATE_ACTIVITIES_BUTTON_WIDTH)/2, activity5CheckBox.getY() + Constants.CHECK_BOX_HEIGHT + Constants.MARGIN_FROM_TOP, Constants.UPDATE_ACTIVITIES_BUTTON_WIDTH, Constants.UPDATE_ACTIVITIES_BUTTON_HEIGHT);
+        Font updateActivitiesButtonFont = new Font("Comic Sans MS", Font.BOLD, Constants.DONE_BUTTON_SIZE);
+        updateActivitiesButton.setFont(updateActivitiesButtonFont);
+        this.add(updateActivitiesButton);
+        updateActivitiesButton.addActionListener(e -> {
             if (checkActivitiesFinalChecks()) {
                 invalidChecksLabel.setText("");
-                this.botAdminInterface = new BotAdminInterface();
-                this.botAdminInterface.setActivities(this.activities);
+                this.botAdminInterface.setAvailableActivities(this.availableActivities);
             }
         });
 
         invalidChecksLabel = new JLabel("");
-        invalidChecksLabel.setBounds((Constants.MANAGE_ACTIVITIES_WINDOW_WIDTH-Constants.INVALID_FINAL_CHECKS_LABEL_WIDTH)/2, doneButton.getY() + Constants.DONE_BUTTON_HEIGHT + Constants.MARGIN_FROM_TOP, Constants.INVALID_FINAL_CHECKS_LABEL_WIDTH, Constants.INVALID_FINAL_CHECKS_LABEL_HEIGHT);
+        invalidChecksLabel.setBounds((Constants.MANAGE_ACTIVITIES_WINDOW_WIDTH/2-Constants.INVALID_FINAL_CHECKS_LABEL_WIDTH)/2, updateActivitiesButton.getY() + Constants.UPDATE_ACTIVITIES_BUTTON_HEIGHT + Constants.MARGIN_FROM_TOP, Constants.INVALID_FINAL_CHECKS_LABEL_WIDTH, Constants.INVALID_FINAL_CHECKS_LABEL_HEIGHT);
         Font invalidChecksFont = new Font("Comic Sans MS", Font.BOLD, Constants.INVALID_CHECKS_LABEL_SIZE);
         invalidChecksLabel.setFont(invalidChecksFont);
         this.add(invalidChecksLabel);
@@ -88,25 +83,21 @@ public class ManageActivitiesWindow extends JFrame {
         String newActivity = checkBox.getText();
         if (isChecked) {
             this.selectedActivities++;
-            if (!activities.contains(newActivity)) {
-                activities.add(newActivity);
+            if (!availableActivities.contains(newActivity)) {
+                availableActivities.add(newActivity);
             }
         } else {
             this.selectedActivities--;
-            activities.remove(newActivity);
+            availableActivities.remove(newActivity);
         }
     }
 
     private boolean checkActivitiesFinalChecks() {
         boolean result = false;
-        if (this.selectedActivities<=3 && this.selectedActivities!=0)  {
+        if (this.selectedActivities<=3)  {
             result = true;
         } else {
-            if (selectedActivities==0) {
-                this.invalidChecksLabel.setText("You did not chose any options");
-            } else {
-                this.invalidChecksLabel.setText("You chose too much options");
-            }
+            this.invalidChecksLabel.setText("You chose too much options");
         }
         return result;
     }

@@ -12,5 +12,11 @@ public class Constants {
     public static final int DONE_BUTTON_HEIGHT = 30;
     public static final int INVALID_FINAL_CHECKS_LABEL_WIDTH = 200;
     public static final int INVALID_FINAL_CHECKS_LABEL_HEIGHT = 30;
+    public static final int DIRECTIVE_LABEL_WIDTH = 300;
+    public static final int DIRECTIVE_LABEL_HEIGHT = 40;
+    public static final int DIRECTIVE_LABEL_SIZE = 18;
+    public static final int ACTIVITY_LABEL_SIZE = 15;
+    public static final int INVALID_CHECKS_LABEL_SIZE = 13;
+
 
 }

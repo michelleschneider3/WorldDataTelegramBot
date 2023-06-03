@@ -9,7 +9,7 @@ public class BotAdminInterface extends JFrame{
         this.setLayout(null);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setTitle("Bot Admin Interface");
+        this.setTitle("WorldDataBot Admin Interface");
         this.setVisible(true);
     }
 

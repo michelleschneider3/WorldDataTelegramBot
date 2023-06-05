@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public class WorldDataBot extends TelegramLongPollingBot {
 
     private BotAdminInterface botAdminInterface;
-
     ArrayList<String> availableActivities;
     @Override
     public String getBotUsername() {
@@ -25,6 +24,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         String username = update.getMessage().getChat().getUserName();
+
         SendMessage message = new SendMessage();;
         message.setChatId(update.getMessage().getChatId());
         message.setText("Hello, @" + username + "!");

@@ -5,13 +5,15 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class Main {
     public static void main(String[] args) {
-        new BotAdminInterface();
+        WorldDataBot worldDataBot = new WorldDataBot();
 
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new WorldDataBot());
+            botsApi.registerBot(worldDataBot);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+
+        new BotAdminInterface(worldDataBot);
     }
 }

@@ -7,12 +7,13 @@ public class ManageActivitiesPanel extends JPanel {
     private int selectedActivities;
     private JLabel invalidChecksLabel;
     private ArrayList<String> availableActivities;
-    public ManageActivitiesPanel() {
+    public ManageActivitiesPanel(BotAdminInterface botAdminInterface) {
         this.setBounds(0,0,Constants.BOT_INTERFACE_WINDOW_WIDTH /2, Constants.BOT_INTERFACE_WINDOW_HEIGHT /2);
         this.setLayout(null);
 
         this.selectedActivities = 0;
         availableActivities = new ArrayList<>();
+        this.botAdminInterface = botAdminInterface;
 
         JLabel directiveLabel = new JLabel("Choose at most 3 activities: ");
         directiveLabel.setBounds(Constants.MARGIN_FROM_LEFT,0,Constants.TITLE_LABEL_WIDTH, Constants.TITLE_LABEL_HEIGHT);

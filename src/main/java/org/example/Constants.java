@@ -20,5 +20,7 @@ public class Constants {
     public static final int DONE_BUTTON_SIZE = 14;
     public static final String[] ACTIVITIES = {"Open Weather API", "News API", "NASA API", "Rest Countries API", "Covid-19 Data API"};
 
-    public static final String[] TIME_RANGES = {"05:00-10:00", "11:00-16:00", "17:00-22:00", "23:00-04:00"};
+    public static final int[][] TIME_RANGES_INTEGER = {{5,10},{11,16},{17,22},{23,4}};
+    public static final String[] TIME_RANGES_STRING = {"05:00-10:00", "11:00-16:00", "17:00-22:00", "23:00-04:00"};
+
 }

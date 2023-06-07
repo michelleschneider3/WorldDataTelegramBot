@@ -14,7 +14,7 @@ public class ActivityHistoryWindow extends JFrame {
 
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.addColumn("User");
-        tableModel.addColumn("Type Activity");
+        tableModel.addColumn("Activity Type");
         tableModel.addColumn("Date");
         JTable table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);

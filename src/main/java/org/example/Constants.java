@@ -18,6 +18,7 @@ public class Constants {
     public static final int REGULAR_LABEL_SIZE = 15;
     public static final int INVALID_CHECKS_LABEL_SIZE = 13;
     public static final int DONE_BUTTON_SIZE = 14;
-
     public static final String[] ACTIVITIES = {"Open Weather API", "News API", "NASA API", "Rest Countries API", "Covid-19 Data API"};
+
+    public static final String[] TIME_RANGES = {"05:00-10:00", "11:00-16:00", "17:00-22:00", "23:00-04:00"};
 }

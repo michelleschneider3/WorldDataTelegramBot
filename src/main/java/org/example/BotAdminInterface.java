@@ -2,12 +2,14 @@ package org.example;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BotAdminInterface extends JFrame{
     private ArrayList<String> availableActivities;
     private WorldDataBot worldDataBot;
-    ArrayList<User> users;
-    ArrayList<ArrayList<String>> activityHistory;
+    private ArrayList<User> users;
+    private ArrayList<ArrayList<String>> activityHistory;
+    private HashMap<Integer, Integer> requestCounts;
 
     public BotAdminInterface() {
         this.setSize(Constants.BOT_INTERFACE_WINDOW_WIDTH,Constants.BOT_INTERFACE_WINDOW_HEIGHT);
@@ -19,6 +21,7 @@ public class BotAdminInterface extends JFrame{
 
         this.users = new ArrayList<>();
         this.activityHistory = new ArrayList<>();
+        this.requestCounts = new HashMap<>();
 
         // Manage Activities
         ManageActivitiesPanel manageActivitiesPanel = new ManageActivitiesPanel();
@@ -67,4 +70,9 @@ public class BotAdminInterface extends JFrame{
         }
         this.activityHistory.add(newActivity);
     }
+
+//    public void addRequestToRequestsCount (String ) {
+//
+//
+//    }
 }

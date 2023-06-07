@@ -1,34 +1,33 @@
 package org.example;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-
+import java.util.ArrayList;
 public class ActivityHistoryWindow extends JFrame {
-    private DefaultTableModel tableModel;
-    public ActivityHistoryWindow () {
+    private ArrayList<ArrayList<String>> activityHistory;
+    public ActivityHistoryWindow (ArrayList<ArrayList<String>> activityHistory) {
         this.setSize(600,700);
         this.setLayout(null);
         this.setResizable(false);
         this.setTitle("Activity History");
 
-        Object[][] data = {
-                { "John", 25, "USA" },
-                { "Alice", 32, "Canada" },
-                { "Bob", 19, "UK" },
-                // Add more rows as needed
-        };
+        this.activityHistory = activityHistory;
 
-
-        Object[] columnNames = { "Name", "Age", "Country" };
-
-        JTable table = new JTable(data, columnNames);
-        table.setFocusable(false);
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.addColumn("User");
+        tableModel.addColumn("Type Activity");
+        tableModel.addColumn("Date");
+        JTable table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(10, 10, 580, 680);
-        this.add(scrollPane);
+        scrollPane.setBounds(0,0,600,700);
+        this.getContentPane().add(scrollPane);
 
+        for (ArrayList<String> activity : activityHistory) {
+            String userName = activity.get(0);
+            String activityType = activity.get(1);
+            String time = activity.get(2);
+            tableModel.addRow(new Object[]{userName, activity, time});
+        }
         this.setVisible(true);
-
     }
 
 }

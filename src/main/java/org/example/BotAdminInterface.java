@@ -7,7 +7,7 @@ public class BotAdminInterface extends JFrame{
     private ArrayList<String> availableActivities;
     private WorldDataBot worldDataBot;
     ArrayList<User> users;
-    ArrayList<String> activityHistory;
+    ArrayList<ArrayList<String>> activityHistory;
 
     public BotAdminInterface() {
         this.setSize(Constants.BOT_INTERFACE_WINDOW_WIDTH,Constants.BOT_INTERFACE_WINDOW_HEIGHT);
@@ -18,6 +18,7 @@ public class BotAdminInterface extends JFrame{
         this.setTitle("WorldDataBot Admin Interface");
 
         this.users = new ArrayList<>();
+        this.activityHistory = new ArrayList<>();
 
         // Manage Activities
         ManageActivitiesPanel manageActivitiesPanel = new ManageActivitiesPanel();
@@ -44,7 +45,7 @@ public class BotAdminInterface extends JFrame{
         activityHistoryButton.setFont(updateButtonFont);
         this.add(activityHistoryButton);
         activityHistoryButton.addActionListener(e -> {
-            new ActivityHistoryWindow();
+            new ActivityHistoryWindow(activityHistory);
         });
 
 
@@ -58,5 +59,12 @@ public class BotAdminInterface extends JFrame{
     public void setAvailableActivities(ArrayList<String> availableActivities) {
         this.availableActivities = availableActivities;
         worldDataBot.setAvailableActivities(availableActivities);
+    }
+
+    public void addActivityToHistoryList (ArrayList<String> newActivity) {
+        if (this.activityHistory.size()==10) {
+            this.activityHistory.remove(0);
+        }
+        this.activityHistory.add(newActivity);
     }
 }

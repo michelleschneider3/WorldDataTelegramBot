@@ -1,15 +1,25 @@
 package org.example;
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotAdminInterface extends JFrame{
     private ArrayList<String> availableActivities;
     private WorldDataBot worldDataBot;
     private ArrayList<User> users;
     private ArrayList<ArrayList<String>> activityHistory;
-    private HashMap<String, Integer> requestCounts;
+    private HashMap<LocalDateTime,HashMap<String, Integer>> requestCounts;
+    private File usersFile;
 
     public BotAdminInterface(WorldDataBot worldDataBot) {
         this.setSize(Constants.BOT_INTERFACE_WINDOW_WIDTH,Constants.BOT_INTERFACE_WINDOW_HEIGHT);
@@ -24,6 +34,8 @@ public class BotAdminInterface extends JFrame{
         this.activityHistory = new ArrayList<>();
         this.requestCounts = new HashMap<>();
         this.worldDataBot = worldDataBot;
+
+        this.usersFile = new File("src/main/resources/Users");
 
         // Manage Activities
         ManageActivitiesPanel manageActivitiesPanel = new ManageActivitiesPanel(this);
@@ -40,7 +52,7 @@ public class BotAdminInterface extends JFrame{
         updateStatisticsButton.addActionListener(e -> {
             UserStatisticsPanel userStatisticsPanel = new UserStatisticsPanel(users);
             this.add(userStatisticsPanel);
-            this.repaint();
+            userStatisticsPanel.repaint();
         });
 
         // Activity History
@@ -60,14 +72,14 @@ public class BotAdminInterface extends JFrame{
         activityGraphButton.setFont(updateButtonFont);
         this.add(activityGraphButton);
         activityGraphButton.addActionListener(e -> {
-            new DailyActivityGraphWindow(this.requestCounts);
+//            new DailyActivityGraphWindow(this.requestCounts);
         });
 
         this.setVisible(true);
     }
 
     public void setAvailableActivities(ArrayList<String> availableActivities) {
-        this.availableActivities = availableActivities;
+        this.availableActivities = new ArrayList<>(availableActivities);
         this.worldDataBot.setAvailableActivities(availableActivities);
     }
 
@@ -78,17 +90,80 @@ public class BotAdminInterface extends JFrame{
         this.activityHistory.add(newActivity);
     }
 
-    public void addRequestToRequestsCount (String date) {
-        int hour = Integer.parseInt(date.trim().substring(0,1));
-        for (int i = 0; i < Constants.TIME_RANGES_INTEGER.length; i++) {
-            if (hour >= Constants.TIME_RANGES_INTEGER[i][1] && hour <= Constants.TIME_RANGES_INTEGER[i][2]) {
-                if (this.requestCounts.containsKey(Constants.TIME_RANGES_STRING[i])) {
-                    int currentValue = this.requestCounts.get(Constants.TIME_RANGES_STRING[i]);
-                    this.requestCounts.put(Constants.TIME_RANGES_STRING[i], currentValue+1);
-                } else {
-                    this.requestCounts.put(Constants.TIME_RANGES_STRING[i], 1);
-                }
-            }
+    public boolean addNewUser (User newUser) {
+        boolean result = false;
+        if (!(this.users.contains(newUser))) {
+            this.users.add(newUser);
+            result = true;
         }
+        return result;
     }
+
+//    private List<User> getUsersFromFile () {
+//        if (this.usersFile.exists()) {
+//            try {
+//                List<User> users = Files.lines(this.usersFile.toPath())
+//                        .map(line -> line.trim().split(","))
+//                        .map(this::parseUser).toList();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            System.out.println("There was an unexpected error");
+//        }
+//        return users;
+//    }
+//
+//    private User parseUser(String[] line) {
+//        String userName = line[0];
+//        HashMap <String, Integer> requests = new HashMap<>();
+//        for (int i = 1; i < line.length; i++) {
+//            requests.put(Constants.ACTIVITIES[i-1], Integer.parseInt(line[i]));
+//        }
+//        User user = new User(userName);
+//        user.setRequests(requests);
+//        return user;
+//    }
+//
+//    private void addUserToFile (User user) {
+//        try {
+//            if (!this.users.contains(user)) {
+//                if (this.usersFile.exists()) {
+//                    String data = user.getUserName() + ",";
+//                    for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
+//
+//                    }
+//                    FileWriter fileWriter = new FileWriter(this.usersFile);
+//                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+//                    bufferedWriter.write();
+//
+//                }
+//            } else {
+//
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+//    public void addRequestToRequestsCount (String date) {
+//        int hour = Integer.parseInt(date.trim().substring(0,1));
+//        for (int i = 0; i < Constants.TIME_RANGES_INTEGER.length; i++) {
+//            if (hour >= Constants.TIME_RANGES_INTEGER[i][1] && hour <= Constants.TIME_RANGES_INTEGER[i][2]) {
+//                LocalDate currentDate = LocalDate.now();
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+//                String formattedDate = currentDate.format(formatter);
+//                if ()
+//                HashMap<String, Integer> requestsByDay = requestCounts.get(formatter);
+//                if (this.requestCounts.containsKey(Constants.TIME_RANGES_STRING[i])) {
+//                    int currentValue = this.requestCounts.get(Constants.TIME_RANGES_STRING[i]);
+//                    this.requestCounts.put(Constants.TIME_RANGES_STRING[i], currentValue+1);
+//                } else {
+//                    this.requestCounts.put(Constants.TIME_RANGES_STRING[i], 1);
+//                }
+//            }
+//        }
+//    }
+
+
 }

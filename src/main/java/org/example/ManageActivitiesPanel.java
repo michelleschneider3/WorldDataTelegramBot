@@ -23,35 +23,35 @@ public class ManageActivitiesPanel extends JPanel {
 
         Font activityFont = new Font("Comic Sans MS", Font.PLAIN, Constants.REGULAR_LABEL_SIZE);
 
-        JCheckBox activity1CheckBox = new JCheckBox("Open Weather API");
+        JCheckBox activity1CheckBox = new JCheckBox(Constants.ACTIVITIES[0]);
         activity1CheckBox.setFocusable(false);
         activity1CheckBox.setBounds(Constants.MARGIN_FROM_LEFT,directiveLabel.getY() + Constants.TITLE_LABEL_HEIGHT + Constants.MARGIN_FROM_TOP,Constants.CHECK_BOX_AND_LABEL_WIDTH,Constants.CHECK_BOX_AND_LABEL_HEIGHT);
         activity1CheckBox.setFont(activityFont);
         this.add(activity1CheckBox);
         activity1CheckBox.addActionListener(a -> updateSelectedActivities(activity1CheckBox.isSelected(), activity1CheckBox));
 
-        JCheckBox activity2CheckBox = new JCheckBox("News API");
+        JCheckBox activity2CheckBox = new JCheckBox(Constants.ACTIVITIES[1]);
         activity2CheckBox.setFocusable(false);
         activity2CheckBox.setBounds(Constants.MARGIN_FROM_LEFT,activity1CheckBox.getY() + Constants.CHECK_BOX_AND_LABEL_HEIGHT + Constants.MARGIN_FROM_TOP,Constants.CHECK_BOX_AND_LABEL_WIDTH,Constants.CHECK_BOX_AND_LABEL_HEIGHT);
         activity2CheckBox.setFont(activityFont);
         this.add(activity2CheckBox);
         activity2CheckBox.addActionListener(b -> updateSelectedActivities(activity2CheckBox.isSelected(), activity2CheckBox));
 
-        JCheckBox activity3CheckBox = new JCheckBox("NASA API");
+        JCheckBox activity3CheckBox = new JCheckBox(Constants.ACTIVITIES[2]);
         activity3CheckBox.setFocusable(false);
         activity3CheckBox.setBounds(Constants.MARGIN_FROM_LEFT,activity2CheckBox.getY() + Constants.CHECK_BOX_AND_LABEL_HEIGHT + Constants.MARGIN_FROM_TOP,Constants.CHECK_BOX_AND_LABEL_WIDTH,Constants.CHECK_BOX_AND_LABEL_HEIGHT);
         activity3CheckBox.setFont(activityFont);
         this.add(activity3CheckBox);
         activity3CheckBox.addActionListener(c -> updateSelectedActivities(activity3CheckBox.isSelected(), activity3CheckBox));
 
-        JCheckBox activity4CheckBox = new JCheckBox("Rest Countries API");
+        JCheckBox activity4CheckBox = new JCheckBox(Constants.ACTIVITIES[3]);
         activity4CheckBox.setFocusable(false);
         activity4CheckBox.setBounds(Constants.MARGIN_FROM_LEFT,activity3CheckBox.getY() + Constants.CHECK_BOX_AND_LABEL_HEIGHT + Constants.MARGIN_FROM_TOP,Constants.CHECK_BOX_AND_LABEL_WIDTH,Constants.CHECK_BOX_AND_LABEL_HEIGHT);
         activity4CheckBox.setFont(activityFont);
         this.add(activity4CheckBox);
         activity4CheckBox.addActionListener(d -> updateSelectedActivities(activity4CheckBox.isSelected(), activity4CheckBox));
 
-        JCheckBox activity5CheckBox = new JCheckBox("Covid-19 Data API");
+        JCheckBox activity5CheckBox = new JCheckBox(Constants.ACTIVITIES[4]);
         activity5CheckBox.setFocusable(false);
         activity5CheckBox.setBounds(Constants.MARGIN_FROM_LEFT,activity4CheckBox.getY() + Constants.CHECK_BOX_AND_LABEL_HEIGHT + Constants.MARGIN_FROM_TOP,Constants.CHECK_BOX_AND_LABEL_WIDTH,Constants.CHECK_BOX_AND_LABEL_HEIGHT);
         activity5CheckBox.setFont(activityFont);
@@ -84,12 +84,12 @@ public class ManageActivitiesPanel extends JPanel {
         String newActivity = checkBox.getText();
         if (isChecked) {
             this.selectedActivities++;
-            if (!availableActivities.contains(newActivity)) {
-                availableActivities.add(newActivity);
+            if (!this.availableActivities.contains(newActivity)) {
+                this.availableActivities.add(newActivity);
             }
         } else {
             this.selectedActivities--;
-            availableActivities.remove(newActivity);
+            this.availableActivities.remove(newActivity);
         }
     }
 

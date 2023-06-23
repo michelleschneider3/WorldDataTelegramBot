@@ -1,8 +1,8 @@
 package org.example;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+
 public class UserStatisticsPanel extends JPanel {
     private int totalRequests;
     private int totalUsers;
@@ -59,53 +59,79 @@ public class UserStatisticsPanel extends JPanel {
     }
 
     private int calculateTotalRequests () {
-        int result = 0;
-        for (User user : this.users) {
-            HashMap<String, Integer> userRequests = user.getRequests();
-            for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
-                result += userRequests.get(Constants.ACTIVITIES[i]);
-            }
-        }
-        return result;
+        return this.users.stream()
+                .flatMap(user -> user.getRequests().entrySet().stream())
+                .filter(entry -> Arrays.asList(Constants.ACTIVITIES).contains(entry.getKey()))
+                .mapToInt(Map.Entry::getValue)
+                .sum();
+
+//        int result = 0;
+//        for (User user : this.users) {
+//            HashMap<String, Integer> userRequests = user.getRequests();
+//            for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
+//                result += userRequests.get(Constants.ACTIVITIES[i]);
+//            }
+//        }
+//        return result;
     }
 
     private int calculateTotalUsers () {
-       return this.users.size();
+        return this.users.size();
     }
 
     private String findMostActiveUser () {
-        String mostActiveUser = "";
-        int sum;
-        int max = 0;
-        for (User user : this.users) {
-            sum = 0;
-            HashMap<String, Integer> userRequests = user.getRequests();
-            for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
-                sum += userRequests.get(Constants.ACTIVITIES[i]);
-            }
-            if (sum>max) {
-                max=sum;
-                mostActiveUser = user.getUserName();
-            }
-        }
-        return mostActiveUser;
+        return users.stream()
+                .max(Comparator.comparingInt(user -> calculateTotalRequestsForUser(user)))
+                .map(User::getUserName)
+                .orElse("");
+//        String mostActiveUser = "";
+//        int sum;
+//        int max = 0;
+//        for (User user : this.users) {
+//            sum = 0;
+//            HashMap<String, Integer> userRequests = user.getRequests();
+//            for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
+//                sum += userRequests.get(Constants.ACTIVITIES[i]);
+//            }
+//            if (sum>max) {
+//                max=sum;
+//                mostActiveUser = user.getUserName();
+//            }
+//        }
+//        return mostActiveUser;
+    }
+
+    private int calculateTotalRequestsForUser(User user) {
+        return Arrays.stream(Constants.ACTIVITIES)
+                .mapToInt(activity -> user.getRequests().getOrDefault(activity, 0))
+                .sum();
     }
 
     private String findMostPopularActivity () {
-        String mostPopularActivity = "";
-        int sum;
-        int max = 0;
-        for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
-            sum = 0;
-            for (User user : this.users) {
-                HashMap<String, Integer> userRequests = user.getRequests();
-                sum += userRequests.get(Constants.ACTIVITIES[i]);
-            }
-            if (sum>max) {
-                max = sum;
-                mostPopularActivity = Constants.ACTIVITIES[i];
-            }
-        }
-        return mostPopularActivity;
+        return Arrays.stream(Constants.ACTIVITIES)
+                .max(Comparator.comparingInt(activity -> calculateTotalRequestsForActivity(activity)))
+                .orElse("");
+
+//        String mostPopularActivity = "";
+//        int sum;
+//        int max = 0;
+//        for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
+//            sum = 0;
+//            for (User user : this.users) {
+//                HashMap<String, Integer> userRequests = user.getRequests();
+//                sum += userRequests.get(Constants.ACTIVITIES[i]);
+//            }
+//            if (sum>max) {
+//                max = sum;
+//                mostPopularActivity = Constants.ACTIVITIES[i];
+//            }
+//        }
+//        return mostPopularActivity;
     }
+    private int calculateTotalRequestsForActivity(String activity) {
+        return users.stream()
+                .mapToInt(user -> user.getRequests().getOrDefault(activity, 0))
+                .sum();
+    }
+
 }

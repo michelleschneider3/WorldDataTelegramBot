@@ -12,7 +12,7 @@ public class User {
         }
     }
 
-    public void setRequests(String activity) {
+    public void updateRequests(String activity) {
         for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
            if (activity.equals(Constants.ACTIVITIES[i])) {
                int value = this.requests.get(Constants.ACTIVITIES[i]);
@@ -29,4 +29,10 @@ public class User {
     public String getUserName() {
         return userName;
     }
+
+    public void setRequests(HashMap<String, Integer> requests) {
+        this.requests = requests;
+    }
+
+
 }

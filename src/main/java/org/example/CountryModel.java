@@ -1,8 +1,6 @@
 package org.example;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryModel {
     private String name;

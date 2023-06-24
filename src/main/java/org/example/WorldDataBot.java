@@ -52,7 +52,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
             this.chatIds.put(newChatId, request);
             fistPartOfRequests(request, newChatId, currentMessageDate, update);
         } else if (this.chatIds.containsKey(newChatId) && !this.chatIds.get(newChatId).equals("")) {
-            secondPartOfRequests(this.chatIds.get(newChatId), newChatId, update, update.getMessage().getText());
+            secondPartOfRequests(this.chatIds.get(newChatId), newChatId, update.getMessage().getText());
         } else {
             String username = update.getMessage().getChat().getUserName();
             sendInitialMessages(newChatId, username);
@@ -66,7 +66,10 @@ public class WorldDataBot extends TelegramLongPollingBot {
         this.botAdminInterface.addActivityToHistoryList(newActivity);
         switch (activity) {
             case WEATHER -> {
-                System.out.println("first part 0");
+                SendMessage weatherMessage = new SendMessage();
+                weatherMessage.setChatId(chatId);
+                weatherMessage.setText("Write the city name: ");
+                send(weatherMessage);
             }
             case NEWS -> {
                 System.out.println("first part 1");
@@ -87,12 +90,12 @@ public class WorldDataBot extends TelegramLongPollingBot {
     }
 
 
-    private void secondPartOfRequests(String request, long chatId, Update update, String text) {
+    private void secondPartOfRequests(String request, long chatId, String text) {
         Activity activity = Activity.getActivityFromRequest(request);
 
         switch (Objects.requireNonNull(activity)) {
             case WEATHER -> {
-                System.out.println("second part 0");
+                this.executorService.submit(() -> handleWeatherInfoRequest(chatId, text));
             }
             case NEWS -> {
                 System.out.println("second part 1");
@@ -104,12 +107,44 @@ public class WorldDataBot extends TelegramLongPollingBot {
                 System.out.println("second part 3");
             }
             case COUNTRIES_INFORMATION -> {
-                this.executorService.submit(() -> handleCountriesInfoRequest(chatId, update, text));
+                this.executorService.submit(() -> handleCountriesInfoRequest(chatId, text));
             }
         }
     }
 
-    private void handleCountriesInfoRequest(long chatId, Update update, String country) {
+    private void handleWeatherInfoRequest (long chatId, String city) {
+        GetRequest getRequest = Unirest.get("https://api.openweathermap.org/data/2.5/weather?q=" + city.trim() + "&appid=eddb0240e632d4039f317d4e8b230209");
+        try {
+            HttpResponse<String> response = getRequest.asString();
+            String json = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                WeatherByCity weatherByCity = objectMapper.readValue(json, new TypeReference<>(){});
+                SendMessage weatherInfoMessage = new SendMessage();
+                weatherInfoMessage.setChatId(chatId);
+                weatherInfoMessage.setText("coord: " + weatherByCity.getCoord() +
+                        "\n\nweather: " + Arrays.toString(weatherByCity.getWeather()) +
+                        "\n\nbase: " + weatherByCity.getBase() +
+                        "\n\nmain: " + weatherByCity.getMain() +
+                        "\n\nvisibility: " + weatherByCity.getVisibility() +
+                        "\n\nwind: " + weatherByCity.getWind() +
+                        "\n\nclouds: " + weatherByCity.getClouds() +
+                        "\n\ndt: " + weatherByCity.getDt() +
+                        "\n\nsys: " + weatherByCity.getSys() +
+                        "\n\ntimezone: " + weatherByCity.getTimezone() +
+                        "\n\nid: " + weatherByCity.getId() +
+                        "\n\nname: " + weatherByCity.getName() +
+                        "\n\ncod: " + weatherByCity.getCod());
+                send(weatherInfoMessage);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        this.chatIds.remove(chatId);
+    }
+    private void handleCountriesInfoRequest(long chatId, String country) {
         GetRequest getRequest = Unirest.get("https://restcountries.com/v2/name/" + country);
         try {
             HttpResponse<String> response = getRequest.asString();

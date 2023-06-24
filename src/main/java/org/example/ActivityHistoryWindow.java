@@ -25,7 +25,7 @@ public class ActivityHistoryWindow extends JFrame {
             String userName = activity.get(0);
             String activityType = activity.get(1);
             String time = activity.get(2);
-            tableModel.addRow(new Object[]{userName, activity, time});
+            tableModel.addRow(new Object[]{userName, activityType ,time});
         }
         this.setVisible(true);
     }

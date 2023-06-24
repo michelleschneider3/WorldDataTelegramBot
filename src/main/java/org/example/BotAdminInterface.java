@@ -1,17 +1,10 @@
 package org.example;
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotAdminInterface extends JFrame{
     private ArrayList<String> availableActivities;
@@ -90,13 +83,16 @@ public class BotAdminInterface extends JFrame{
         this.activityHistory.add(newActivity);
     }
 
-    public boolean addNewUser (User newUser) {
-        boolean result = false;
-        if (!(this.users.contains(newUser))) {
-            this.users.add(newUser);
-            result = true;
+    public void addNewUser (User newUser) {
+        boolean result = true;
+        for (User user : this.users) {
+            if (newUser.getUserName().equals(user.getUserName())) {
+                result = false;
+            }
         }
-        return result;
+        if (result) {
+            this.users.add(newUser);
+        }
     }
 
 //    private List<User> getUsersFromFile () {
@@ -165,5 +161,22 @@ public class BotAdminInterface extends JFrame{
 //        }
 //    }
 
+    public void findUserAndUpdateTheRequests (String activity, long chatId) {
+        for (User user : this.users) {
+            if (user.equalsUserByChatId(chatId)) {
+                user.updateRequests(activity);
+            }
+        }
+    }
+
+    public String getUserNameByChatId (long chatId) {
+        String result = "";
+        for (User user : this.users) {
+            if (user.getChatId() == chatId) {
+                result = user.getUserName();
+            }
+        }
+        return result;
+    }
 
 }

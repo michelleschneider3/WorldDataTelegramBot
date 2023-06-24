@@ -1,5 +1,4 @@
 package org.example;
-
 public enum Activity {
     WEATHER("Weather"),
     NEWS("News"),
@@ -22,7 +21,7 @@ public enum Activity {
         return null;
     }
 
-    private String getActivityName() {
+    public String getActivityName() {
         return this.activityName;
     }
 }

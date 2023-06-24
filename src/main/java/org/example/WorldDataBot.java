@@ -35,24 +35,37 @@ public class WorldDataBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         // initial messages
         long newChatId = getChatId(update);
+
         if (this.chatIds.containsKey(newChatId) && this.chatIds.get(newChatId)) {
+            long unixTimestamp = update.getCallbackQuery().getMessage().getDate();
+            String currentMessageDate = currentMessageDate(unixTimestamp);
+            System.out.println(currentMessageDate);
+
             this.chatIds.put(newChatId, false);
-            applyRequests(update.getCallbackQuery().getData(), newChatId);
+            applyRequests(update.getCallbackQuery().getData(), newChatId, currentMessageDate);
         } else {
             String username = update.getMessage().getChat().getUserName();
             sendInitialMessages(newChatId, username);
         }
-        // message date
-        long unixTimestamp = update.getMessage().getDate();
-        String currentMessageDate = currentMessageDate(unixTimestamp);
     }
 
-    private void applyRequests (String request, long chatId) {
+    private void applyRequests (String request, long chatId, String currentMessageDate) {
         Activity activity = Activity.getActivityFromRequest(request);
+        this.botAdminInterface.findUserAndUpdateTheRequests(activity.getActivityName(), chatId);
+        ArrayList<String> newActivity = makeNewActivityForHistory(this.botAdminInterface.getUserNameByChatId(chatId), activity.getActivityName(), currentMessageDate);
+        this.botAdminInterface.addActivityToHistoryList(newActivity);
 
         switch (activity) {
             case WEATHER -> {
-                System.out.println("0");
+                SendMessage weatherMessage = new SendMessage();
+                weatherMessage.setChatId(chatId);
+                weatherMessage.setText("Write the city name: ");
+                send(weatherMessage);
+
+
+
+                this.chatIds.remove(chatId);
+                // לא לשכוח שבכל כל סוף בקשה למחוק את הצאט ID של המשתמש הזה מהליסט של צאט IDS
             }
             case NEWS -> {
                 System.out.println("1");
@@ -69,6 +82,14 @@ public class WorldDataBot extends TelegramLongPollingBot {
         }
     }
 
+    private ArrayList<String> makeNewActivityForHistory (String userName, String activityName, String currentMessageDate) {
+        ArrayList<String> newActivity = new ArrayList<>();
+        newActivity.add(userName);
+        newActivity.add(activityName);
+        newActivity.add(currentMessageDate);
+        return newActivity;
+    }
+
     private long getChatId (Update update) {
         long chatId = 0;
         if (update.getMessage() != null) {
@@ -81,10 +102,8 @@ public class WorldDataBot extends TelegramLongPollingBot {
 
     private void sendInitialMessages (long chatId, String username) {
         boolean isNewChatIdAdded = addChatId(chatId);
-        if (isNewChatIdAdded) {
-            User newUser = new User(username);
-            botAdminInterface.addNewUser(newUser);
-        }
+        botAdminInterface.addNewUser(new User(username, chatId));
+
         SendMessage welcomingMessage = new SendMessage();
         welcomingMessage.setChatId(chatId);
         welcomingMessage.setText("Hello @" + username + ", Welcome to world data bot!");
@@ -104,14 +123,11 @@ public class WorldDataBot extends TelegramLongPollingBot {
         listMessage.setReplyMarkup(inlineKeyboardMarkup);
         listMessage.setText("Choose the API from the list below:");
 
-        try {
-            if (isNewChatIdAdded) {
-                execute(welcomingMessage);
-                execute(listMessage);
-            }
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        if (isNewChatIdAdded) {
+            send(welcomingMessage);
+            send(listMessage);
         }
+
         this.chatIds.put(chatId, true);
     }
 
@@ -133,5 +149,13 @@ public class WorldDataBot extends TelegramLongPollingBot {
             result = true;
         }
         return result;
+    }
+
+    private void send (SendMessage sendMessage) {
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

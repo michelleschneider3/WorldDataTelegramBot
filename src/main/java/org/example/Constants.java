@@ -2,7 +2,7 @@ package org.example;
 public class Constants {
     public static final String BOT_USER_NAME = "WorldDataBot";
     public static final String BOT_TOKEN = "5916599638:AAFcHKKGlF6cjqF0iYujl6-7nZmQHEKw1SI";
-    public static final int CHECK_BOX_AND_LABEL_WIDTH = 200;
+    public static final int CHECK_BOX_AND_LABEL_WIDTH = 300;
     public static final int CHECK_BOX_AND_LABEL_HEIGHT = 40;
     public static final int MARGIN_FROM_TOP = 5;
     public static final int MARGIN_FROM_LEFT = 10;

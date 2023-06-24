@@ -1,7 +1,6 @@
 package org.example;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ public class BotAdminInterface extends JFrame{
     private ArrayList<User> users;
     private ArrayList<ArrayList<String>> activityHistory;
     private HashMap<LocalDateTime,HashMap<String, Integer>> requestCounts;
-    private File usersFile;
 
     public BotAdminInterface(WorldDataBot worldDataBot) {
         this.setSize(Constants.BOT_INTERFACE_WINDOW_WIDTH,Constants.BOT_INTERFACE_WINDOW_HEIGHT);
@@ -27,8 +25,6 @@ public class BotAdminInterface extends JFrame{
         this.activityHistory = new ArrayList<>();
         this.requestCounts = new HashMap<>();
         this.worldDataBot = worldDataBot;
-
-        this.usersFile = new File("src/main/resources/Users");
 
         // Manage Activities
         ManageActivitiesPanel manageActivitiesPanel = new ManageActivitiesPanel(this);
@@ -95,52 +91,6 @@ public class BotAdminInterface extends JFrame{
         }
     }
 
-//    private List<User> getUsersFromFile () {
-//        if (this.usersFile.exists()) {
-//            try {
-//                List<User> users = Files.lines(this.usersFile.toPath())
-//                        .map(line -> line.trim().split(","))
-//                        .map(this::parseUser).toList();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            System.out.println("There was an unexpected error");
-//        }
-//        return users;
-//    }
-//
-//    private User parseUser(String[] line) {
-//        String userName = line[0];
-//        HashMap <String, Integer> requests = new HashMap<>();
-//        for (int i = 1; i < line.length; i++) {
-//            requests.put(Constants.ACTIVITIES[i-1], Integer.parseInt(line[i]));
-//        }
-//        User user = new User(userName);
-//        user.setRequests(requests);
-//        return user;
-//    }
-//
-//    private void addUserToFile (User user) {
-//        try {
-//            if (!this.users.contains(user)) {
-//                if (this.usersFile.exists()) {
-//                    String data = user.getUserName() + ",";
-//                    for (int i = 0; i < Constants.ACTIVITIES.length; i++) {
-//
-//                    }
-//                    FileWriter fileWriter = new FileWriter(this.usersFile);
-//                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-//                    bufferedWriter.write();
-//
-//                }
-//            } else {
-//
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
 //    public void addRequestToRequestsCount (String date) {
 //        int hour = Integer.parseInt(date.trim().substring(0,1));

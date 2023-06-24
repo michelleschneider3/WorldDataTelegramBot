@@ -1,4 +1,11 @@
 package org.example;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -6,20 +13,22 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class WorldDataBot extends TelegramLongPollingBot {
     private BotAdminInterface botAdminInterface;
     private ArrayList<String> availableActivities;
-    private HashMap<Long, Boolean> chatIds;
+    private HashMap<Long, String> chatIds;
+    private ExecutorService executorService;
     public WorldDataBot () {
         this.botAdminInterface = new BotAdminInterface(this);
         this.chatIds = new HashMap<>();
         this.availableActivities = new ArrayList<>();
+        executorService = Executors.newFixedThreadPool(10);
     }
     @Override
     public String getBotUsername() {
@@ -36,50 +45,104 @@ public class WorldDataBot extends TelegramLongPollingBot {
         // initial messages
         long newChatId = getChatId(update);
 
-        if (this.chatIds.containsKey(newChatId) && this.chatIds.get(newChatId)) {
+        if (this.chatIds.containsKey(newChatId) && this.chatIds.get(newChatId).equals("")) {
             long unixTimestamp = update.getCallbackQuery().getMessage().getDate();
             String currentMessageDate = currentMessageDate(unixTimestamp);
-            System.out.println(currentMessageDate);
-
-            this.chatIds.put(newChatId, false);
-            applyRequests(update.getCallbackQuery().getData(), newChatId, currentMessageDate);
+            String request = update.getCallbackQuery().getData();
+            this.chatIds.put(newChatId, request);
+            fistPartOfRequests(request, newChatId, currentMessageDate, update);
+        } else if (this.chatIds.containsKey(newChatId) && !this.chatIds.get(newChatId).equals("")) {
+            secondPartOfRequests(this.chatIds.get(newChatId), newChatId, update, update.getMessage().getText());
         } else {
             String username = update.getMessage().getChat().getUserName();
             sendInitialMessages(newChatId, username);
         }
     }
 
-    private void applyRequests (String request, long chatId, String currentMessageDate) {
+    private void fistPartOfRequests(String request, long chatId, String currentMessageDate, Update update) {
         Activity activity = Activity.getActivityFromRequest(request);
         this.botAdminInterface.findUserAndUpdateTheRequests(activity.getActivityName(), chatId);
         ArrayList<String> newActivity = makeNewActivityForHistory(this.botAdminInterface.getUserNameByChatId(chatId), activity.getActivityName(), currentMessageDate);
         this.botAdminInterface.addActivityToHistoryList(newActivity);
-
         switch (activity) {
             case WEATHER -> {
-                SendMessage weatherMessage = new SendMessage();
-                weatherMessage.setChatId(chatId);
-                weatherMessage.setText("Write the city name: ");
-                send(weatherMessage);
-
-
-
-                this.chatIds.remove(chatId);
-                // לא לשכוח שבכל כל סוף בקשה למחוק את הצאט ID של המשתמש הזה מהליסט של צאט IDS
+                System.out.println("first part 0");
             }
             case NEWS -> {
-                System.out.println("1");
+                System.out.println("first part 1");
             }
             case NASA -> {
-                System.out.println("2");
+                System.out.println("first part 2");
             }
             case COVID_19_DATA -> {
-                System.out.println("3");
+                System.out.println("first part 3");
             }
             case COUNTRIES_INFORMATION -> {
-                System.out.println("4");
+                SendMessage countriesMessage = new SendMessage();
+                countriesMessage.setChatId(chatId);
+                countriesMessage.setText("Write the country name: ");
+                send(countriesMessage);
             }
         }
+    }
+
+
+    private void secondPartOfRequests(String request, long chatId, Update update, String text) {
+        Activity activity = Activity.getActivityFromRequest(request);
+
+        switch (Objects.requireNonNull(activity)) {
+            case WEATHER -> {
+                System.out.println("second part 0");
+            }
+            case NEWS -> {
+                System.out.println("second part 1");
+            }
+            case NASA -> {
+                System.out.println("second part 2");
+            }
+            case COVID_19_DATA -> {
+                System.out.println("second part 3");
+            }
+            case COUNTRIES_INFORMATION -> {
+                this.executorService.submit(() -> handleCountriesInfoRequest(chatId, update, text));
+            }
+        }
+    }
+
+    private void handleCountriesInfoRequest(long chatId, Update update, String country) {
+        GetRequest getRequest = Unirest.get("https://restcountries.com/v2/name/" + country);
+        try {
+            HttpResponse<String> response = getRequest.asString();
+            String json = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<CountryModel> countryModel = objectMapper.readValue(json, new TypeReference<>(){});
+                for (CountryModel countryModel1 : countryModel) {
+                    SendMessage countryInfoMessage = new SendMessage();
+                    countryInfoMessage.setChatId(chatId);
+                    countryInfoMessage.setText("name: " + countryModel1.getName() +
+                            "\n\nalpha2Code: " + countryModel1.getAlpha2Code() +
+                            "\n\nalpha3Code: " + countryModel1.getAlpha3Code() +
+                            "\n\ncallingCodes: " + Arrays.toString(countryModel1.getCallingCodes()) +
+                            "\n\nsubregion: " + countryModel1.getSubregion() +
+                            "\n\nregion: " + countryModel1.getRegion() +
+                            "\n\npopulation : " + countryModel1.getPopulation() +
+                            "\n\ndemonym :" + countryModel1.getDemonym() +
+                            "\n\narea: " + countryModel1.getArea() +
+                            "\n\ntimezones: " + Arrays.toString(countryModel1.getTimezones()) +
+                            "\n\nnativeName: " + countryModel1.getNativeName() +
+                            "\n\nnumericCode: " + countryModel1.getNumericCode() +
+                            "\n\nflag: " + countryModel1.getFlag());
+                    send(countryInfoMessage);
+                }
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        this.chatIds.remove(chatId);
+        // לא לשכוח שבכל כל סוף בקשה למחוק את הצאט ID של המשתמש הזה מהליסט של צאט IDS
     }
 
     private ArrayList<String> makeNewActivityForHistory (String userName, String activityName, String currentMessageDate) {
@@ -87,6 +150,9 @@ public class WorldDataBot extends TelegramLongPollingBot {
         newActivity.add(userName);
         newActivity.add(activityName);
         newActivity.add(currentMessageDate);
+
+
+
         return newActivity;
     }
 
@@ -127,8 +193,6 @@ public class WorldDataBot extends TelegramLongPollingBot {
             send(welcomingMessage);
             send(listMessage);
         }
-
-        this.chatIds.put(chatId, true);
     }
 
     private String currentMessageDate (long unixTimestamp) {
@@ -145,7 +209,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
     private boolean addChatId (Long chatId) {
         boolean result = false;
         if (!(this.chatIds.containsKey(chatId))) {
-            this.chatIds.put(chatId, false);
+            this.chatIds.put(chatId, "");
             result = true;
         }
         return result;

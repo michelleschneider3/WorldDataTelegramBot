@@ -1,10 +1,10 @@
 package org.example;
 public enum Activity {
-    WEATHER("Weather"),
+    PUBLIC_HOLIDAYS("Public holidays"),
     NEWS("News"),
     NASA("NASA"),
     COUNTRIES_INFORMATION("Countries information"),
-    COVID_19_DATA("Covid-19 Data");
+    UNIVERSITIES("Universities");
 
     private final String activityName;
 

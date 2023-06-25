@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -42,9 +41,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        // initial messages
         long newChatId = getChatId(update);
-
         if (this.chatIds.containsKey(newChatId) && this.chatIds.get(newChatId).equals("")) {
             long unixTimestamp = update.getCallbackQuery().getMessage().getDate();
             String currentMessageDate = currentMessageDate(unixTimestamp);
@@ -65,28 +62,28 @@ public class WorldDataBot extends TelegramLongPollingBot {
         ArrayList<String> newActivity = makeNewActivityForHistory(this.botAdminInterface.getUserNameByChatId(chatId), activity.getActivityName(), currentMessageDate);
         this.botAdminInterface.addActivityToHistoryList(newActivity);
         switch (activity) {
-            case WEATHER -> {
-                SendMessage weatherMessage = new SendMessage();
-                weatherMessage.setChatId(chatId);
-                weatherMessage.setText("Write the city name: ");
+            case PUBLIC_HOLIDAYS -> {
+                SendMessage weatherMessage = createMessage("Write the ISO 3166 code of the country (for example: russia=RU): ", chatId);
                 send(weatherMessage);
             }
             case NEWS -> {
                 System.out.println("first part 1");
             }
             case NASA -> {
-                System.out.println("first part 2");
+                secondPartOfRequests(this.chatIds.get(chatId), chatId, null);
             }
-            case COVID_19_DATA -> {
-                System.out.println("first part 3");
-            }
-            case COUNTRIES_INFORMATION -> {
-                SendMessage countriesMessage = new SendMessage();
-                countriesMessage.setChatId(chatId);
-                countriesMessage.setText("Write the country name: ");
-                send(countriesMessage);
+            case UNIVERSITIES, COUNTRIES_INFORMATION -> {
+                SendMessage universitiesAndCountriesMessage = createMessage("write the name of country: ", chatId);
+                send(universitiesAndCountriesMessage);
             }
         }
+    }
+
+    private SendMessage createMessage (String text, long chatId) {
+        SendMessage newMessage = new SendMessage();
+        newMessage.setChatId(chatId);
+        newMessage.setText(text);
+        return newMessage;
     }
 
 
@@ -94,17 +91,17 @@ public class WorldDataBot extends TelegramLongPollingBot {
         Activity activity = Activity.getActivityFromRequest(request);
 
         switch (Objects.requireNonNull(activity)) {
-            case WEATHER -> {
-                this.executorService.submit(() -> handleWeatherInfoRequest(chatId, text));
+            case PUBLIC_HOLIDAYS -> {
+                this.executorService.submit(() -> handlePublicHolidaysInfoRequest(chatId, text));
             }
             case NEWS -> {
                 System.out.println("second part 1");
             }
             case NASA -> {
-                System.out.println("second part 2");
+                this.executorService.submit(() -> handleNasaPictureOfTheDayRequest(chatId));
             }
-            case COVID_19_DATA -> {
-                System.out.println("second part 3");
+            case UNIVERSITIES -> {
+                this.executorService.submit(() -> handleUniversitiesInfoRequest(chatId, text));
             }
             case COUNTRIES_INFORMATION -> {
                 this.executorService.submit(() -> handleCountriesInfoRequest(chatId, text));
@@ -112,30 +109,71 @@ public class WorldDataBot extends TelegramLongPollingBot {
         }
     }
 
-    private void handleWeatherInfoRequest (long chatId, String city) {
-        GetRequest getRequest = Unirest.get("https://api.openweathermap.org/data/2.5/weather?q=" + city.trim() + "&appid=eddb0240e632d4039f317d4e8b230209");
+    private void handleUniversitiesInfoRequest(long chatId, String text) {
+        GetRequest getRequest = Unirest.get("http://universities.hipolabs.com/search?country=" + text);
         try {
             HttpResponse<String> response = getRequest.asString();
-            String json = response.getBody();
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                WeatherByCity weatherByCity = objectMapper.readValue(json, new TypeReference<>(){});
-                SendMessage weatherInfoMessage = new SendMessage();
-                weatherInfoMessage.setChatId(chatId);
-                weatherInfoMessage.setText("coord: " + weatherByCity.getCoord() +
-                        "\n\nweather: " + Arrays.toString(weatherByCity.getWeather()) +
-                        "\n\nbase: " + weatherByCity.getBase() +
-                        "\n\nmain: " + weatherByCity.getMain() +
-                        "\n\nvisibility: " + weatherByCity.getVisibility() +
-                        "\n\nwind: " + weatherByCity.getWind() +
-                        "\n\nclouds: " + weatherByCity.getClouds() +
-                        "\n\ndt: " + weatherByCity.getDt() +
-                        "\n\nsys: " + weatherByCity.getSys() +
-                        "\n\ntimezone: " + weatherByCity.getTimezone() +
-                        "\n\nid: " + weatherByCity.getId() +
-                        "\n\nname: " + weatherByCity.getName() +
-                        "\n\ncod: " + weatherByCity.getCod());
-                send(weatherInfoMessage);
+                List<UniversityModel> universityModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<UniversityModel>>(){});
+                for (UniversityModel universityModel : universityModelList) {
+                    SendMessage universitiesInfoMessage = new SendMessage();
+                    universitiesInfoMessage.setChatId(chatId);
+                    universitiesInfoMessage.setText("country: " + universityModel.getCountry() +
+                            "\nalpha two code: " + universityModel.getAlpha_two_code() +
+                            "\nName: " + universityModel.getName() +
+                            "\nweb_pages: " + Arrays.toString(universityModel.getWeb_pages()));
+                    send(universitiesInfoMessage);
+                }
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        this.chatIds.remove(chatId);
+    }
+
+    private void handleNasaPictureOfTheDayRequest (long chatId) {
+        GetRequest getRequest = Unirest.get("https://api.nasa.gov/planetary/apod?api_key=mglHbNmXB8rG1E7GcXUqKFlorMXcL3qgirT7DLGZ");
+        try {
+            HttpResponse<String> response = getRequest.asString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                NasaPictureOfTheDay nasaPictureOfTheDay = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
+                SendMessage nasaPictureMessage = new SendMessage();
+                nasaPictureMessage.setChatId(chatId);
+                nasaPictureMessage.setText("date: " + nasaPictureOfTheDay.getDate() +
+                        "\n\nexplanation: " + nasaPictureOfTheDay.getExplanation() +
+                        "\n\nhdurl: " + nasaPictureOfTheDay.getHdurl() +
+                        "\n\nmedia type: " + nasaPictureOfTheDay.getMedia_type() +
+                        "\n\nservice version: " + nasaPictureOfTheDay.getService_version() +
+                        "\n\ntitle: " + nasaPictureOfTheDay.getTitle());
+                send(nasaPictureMessage);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        this.chatIds.remove(chatId);
+    }
+    private void handlePublicHolidaysInfoRequest(long chatId, String ISOCode) {
+        GetRequest getRequest = Unirest.get("https://date.nager.at/api/v2/publicholidays/2023/" + ISOCode);
+        try {
+            HttpResponse<String> response = getRequest.asString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<PublicHolidaysByCountry> publicHolidaysList = objectMapper.readValue(response.getBody(), new TypeReference<List<PublicHolidaysByCountry>>(){});
+                for (PublicHolidaysByCountry publicHoliday : publicHolidaysList) {
+                    SendMessage holidaysInfoMessage = new SendMessage();
+                    holidaysInfoMessage.setChatId(chatId);
+                    holidaysInfoMessage.setText("Date: " + publicHoliday.getDate() +
+                            "\nLocal Name: " + publicHoliday.getLocalName() +
+                            "\nName: " + publicHoliday.getName() +
+                            "\nCountry Code: " + publicHoliday.getCountryCode());
+                    send(holidaysInfoMessage);
+                }
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -148,10 +186,9 @@ public class WorldDataBot extends TelegramLongPollingBot {
         GetRequest getRequest = Unirest.get("https://restcountries.com/v2/name/" + country);
         try {
             HttpResponse<String> response = getRequest.asString();
-            String json = response.getBody();
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                List<CountryModel> countryModel = objectMapper.readValue(json, new TypeReference<>(){});
+                List<CountryModel> countryModel = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
                 for (CountryModel countryModel1 : countryModel) {
                     SendMessage countryInfoMessage = new SendMessage();
                     countryInfoMessage.setChatId(chatId);
@@ -185,9 +222,6 @@ public class WorldDataBot extends TelegramLongPollingBot {
         newActivity.add(userName);
         newActivity.add(activityName);
         newActivity.add(currentMessageDate);
-
-
-
         return newActivity;
     }
 

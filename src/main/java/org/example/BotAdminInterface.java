@@ -24,13 +24,11 @@ public class BotAdminInterface extends JFrame{
         this.activityHistory = new ArrayList<>();
         this.worldDataBot = worldDataBot;
 
-        // Manage Activities
         ManageActivitiesPanel manageActivitiesPanel = new ManageActivitiesPanel(this);
         this.add(manageActivitiesPanel);
 
         Font updateButtonFont = new Font("Comic Sans MS", Font.BOLD, Constants.DONE_BUTTON_SIZE);
 
-        // User Statistics
         JButton updateStatisticsButton = new JButton("Update Statistics");
         updateStatisticsButton.setFocusable(false);
         updateStatisticsButton.setBounds(Constants.BOT_INTERFACE_WINDOW_WIDTH /2+(Constants.BOT_INTERFACE_WINDOW_WIDTH /2-Constants.UPDATE_BUTTON_WIDTH)/2,Constants.BOT_INTERFACE_WINDOW_HEIGHT /2-2*Constants.UPDATE_BUTTON_HEIGHT, Constants.UPDATE_BUTTON_WIDTH, Constants.UPDATE_BUTTON_HEIGHT);
@@ -42,7 +40,6 @@ public class BotAdminInterface extends JFrame{
             userStatisticsPanel.repaint();
         });
 
-        // Activity History
         JButton activityHistoryButton = new JButton("Activity History");
         activityHistoryButton.setFocusable(false);
         activityHistoryButton.setBounds((Constants.BOT_INTERFACE_WINDOW_WIDTH/2-Constants.UPDATE_BUTTON_WIDTH)/2, Constants.BOT_INTERFACE_WINDOW_HEIGHT/2 + 9*Constants.MARGIN_FROM_TOP, Constants.UPDATE_BUTTON_WIDTH, Constants.UPDATE_BUTTON_HEIGHT);
@@ -52,7 +49,6 @@ public class BotAdminInterface extends JFrame{
             new ActivityHistoryWindow(activityHistory);
         });
 
-        // Requests Graph
         JButton activityGraphButton = new JButton("Daily Activity Graph");
         activityGraphButton.setFocusable(false);
         activityGraphButton.setBounds(Constants.BOT_INTERFACE_WINDOW_WIDTH/2+(Constants.BOT_INTERFACE_WINDOW_WIDTH/2-Constants.UPDATE_BUTTON_WIDTH)/2, Constants.BOT_INTERFACE_WINDOW_HEIGHT/2 + 9*Constants.MARGIN_FROM_TOP, Constants.UPDATE_BUTTON_WIDTH, Constants.UPDATE_BUTTON_HEIGHT);
@@ -104,13 +100,4 @@ public class BotAdminInterface extends JFrame{
         }
         return result;
     }
-
-    public HashMap<String, Integer> createRequestByDayMap () {
-        HashMap<String, Integer> result = new HashMap<>();
-        for (int i = 0; i < Constants.TIME_RANGES_STRING.length; i++) {
-            result.put(Constants.TIME_RANGES_STRING[i], 0);
-        }
-        return result;
-    }
-
 }

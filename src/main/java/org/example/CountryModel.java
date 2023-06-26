@@ -121,22 +121,4 @@ public class CountryModel {
         this.flag = flag;
     }
 
-    @Override
-    public String toString() {
-        return "CountryModel{" +
-                "name='" + name + '\'' +
-                ", alpha2Code='" + alpha2Code + '\'' +
-                ", alpha3Code='" + alpha3Code + '\'' +
-                ", callingCodes=" + Arrays.toString(callingCodes) +
-                ", subregion='" + subregion + '\'' +
-                ", region='" + region + '\'' +
-                ", population='" + population + '\'' +
-                ", demonym='" + demonym + '\'' +
-                ", area='" + area + '\'' +
-                ", timezones=" + Arrays.toString(timezones) +
-                ", nativeName='" + nativeName + '\'' +
-                ", numericCode='" + numericCode + '\'' +
-                ", flag='" + flag + '\'' +
-                '}';
-    }
 }

@@ -69,9 +69,13 @@ public class WorldDataBot extends TelegramLongPollingBot {
             case QUOTES, NASA -> {
                 secondPartOfRequests(this.chatIds.get(chatId), chatId, null);
             }
-            case UNIVERSITIES, COUNTRIES_INFORMATION -> {
-                SendMessage universitiesAndCountriesMessage = createMessage("write the name of country: ", chatId);
-                send(universitiesAndCountriesMessage);
+            case MAKEUP -> {
+                SendMessage makeupMessage = createMessage("write the name of the brand and type product: \n\nfor example: dior,foundation" , chatId);
+                send(makeupMessage);
+            }
+            case COUNTRIES_INFORMATION -> {
+                SendMessage countriesMessage = createMessage("write the name of the country: ", chatId);
+                send(countriesMessage);
             }
         }
     }
@@ -97,8 +101,8 @@ public class WorldDataBot extends TelegramLongPollingBot {
             case NASA -> {
                 this.executorService.submit(() -> handleNasaPictureOfTheDayRequest(chatId));
             }
-            case UNIVERSITIES -> {
-                this.executorService.submit(() -> handleUniversitiesInfoRequest(chatId, text));
+            case MAKEUP -> {
+                this.executorService.submit(() -> handleMakeupInfoRequest(chatId, text));
             }
             case COUNTRIES_INFORMATION -> {
                 this.executorService.submit(() -> handleCountriesInfoRequest(chatId, text));
@@ -114,8 +118,9 @@ public class WorldDataBot extends TelegramLongPollingBot {
             try {
                 List<QuoteModel> quoteModels = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
                 for (QuoteModel quoteModel : quoteModels) {
-                    SendMessage quoteMessage = createMessage("content: " + quoteModel.getContent() +
-                            "\n\nauthor: " + quoteModel.getAuthor(), chatId);
+                    String textMessage = "content: " + quoteModel.getContent() +
+                            "\n\nauthor: " + quoteModel.getAuthor();
+                    SendMessage quoteMessage = createMessage(textMessage, chatId);
                     send(quoteMessage);
                 }
             } catch (JsonProcessingException e) {
@@ -129,20 +134,24 @@ public class WorldDataBot extends TelegramLongPollingBot {
 
     }
 
-    private void handleUniversitiesInfoRequest(long chatId, String text) {
-        GetRequest getRequest = Unirest.get("http://universities.hipolabs.com/search?country=" + text);
+    private void handleMakeupInfoRequest(long chatId, String text) {
+        System.out.println("hello");
+        String[] brandAndTypeProduct = text.split(",");
+        GetRequest getRequest = Unirest.get("http://makeup-api.herokuapp.com/api/v1/products.json?brand=" + brandAndTypeProduct[0].trim() + "&product_type=" + brandAndTypeProduct[1].trim());
         try {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                List<UniversityModel> universityModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<UniversityModel>>(){});
-                for (UniversityModel universityModel : universityModelList) {
-                    String textMessage = "country: " + universityModel.getCountry() +
-                            "\nalpha two code: " + universityModel.getAlpha_two_code() +
-                            "\nName: " + universityModel.getName() +
-                            "\nweb_pages: " + Arrays.toString(universityModel.getWeb_pages());
-                    SendMessage universitiesInfoMessage = createMessage(textMessage, chatId);
-                    send(universitiesInfoMessage);
+                List<MakeupProductModel> makeupProductModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<MakeupProductModel>>(){});
+                for (MakeupProductModel makeupProductModel : makeupProductModelList) {
+                    String textMessage = "brand: " + makeupProductModel.getBrand() +
+                            "\nprice: " + makeupProductModel.getPrice() +
+                            "\nName: " + makeupProductModel.getName() +
+                            "\n\ncategory: " + makeupProductModel.getCategory() +
+                            "\n\nproduct_type: " + makeupProductModel.getProduct_type() +
+                            "\n\nproduct_link: " + makeupProductModel.getProduct_link();
+                    SendMessage makeupInfoMessage = createMessage(textMessage, chatId);
+                    send(makeupInfoMessage);
                 }
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -160,12 +169,11 @@ public class WorldDataBot extends TelegramLongPollingBot {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 NasaPictureOfTheDay nasaPictureOfTheDay = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
-                SendMessage nasaPictureMessage = new SendMessage();
-                nasaPictureMessage.setChatId(chatId);
-                nasaPictureMessage.setText("date: " + nasaPictureOfTheDay.getDate() +
+                String textMessage = "date: " + nasaPictureOfTheDay.getDate() +
                         "\n\nexplanation: " + nasaPictureOfTheDay.getExplanation() +
                         "\n\nhdurl: " + nasaPictureOfTheDay.getHdurl() +
-                        "\n\ntitle: " + nasaPictureOfTheDay.getTitle());
+                        "\n\ntitle: " + nasaPictureOfTheDay.getTitle();
+                SendMessage nasaPictureMessage = createMessage(textMessage, chatId);
                 send(nasaPictureMessage);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -183,12 +191,11 @@ public class WorldDataBot extends TelegramLongPollingBot {
             try {
                 List<PublicHolidaysByCountry> publicHolidaysList = objectMapper.readValue(response.getBody(), new TypeReference<List<PublicHolidaysByCountry>>(){});
                 for (PublicHolidaysByCountry publicHoliday : publicHolidaysList) {
-                    SendMessage holidaysInfoMessage = new SendMessage();
-                    holidaysInfoMessage.setChatId(chatId);
-                    holidaysInfoMessage.setText("Date: " + publicHoliday.getDate() +
+                    String textMessage = "Date: " + publicHoliday.getDate() +
                             "\nLocal Name: " + publicHoliday.getLocalName() +
                             "\nName: " + publicHoliday.getName() +
-                            "\nCountry Code: " + publicHoliday.getCountryCode());
+                            "\nCountry Code: " + publicHoliday.getCountryCode();
+                    SendMessage holidaysInfoMessage = createMessage(textMessage, chatId);
                     send(holidaysInfoMessage);
                 }
             } catch (JsonProcessingException e) {
@@ -207,9 +214,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
             try {
                 List<CountryModel> countryModel = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
                 for (CountryModel countryModel1 : countryModel) {
-                    SendMessage countryInfoMessage = new SendMessage();
-                    countryInfoMessage.setChatId(chatId);
-                    countryInfoMessage.setText("name: " + countryModel1.getName() +
+                    String textMessage = "name: " + countryModel1.getName() +
                             "\n\nalpha2Code: " + countryModel1.getAlpha2Code() +
                             "\n\nalpha3Code: " + countryModel1.getAlpha3Code() +
                             "\n\ncallingCodes: " + Arrays.toString(countryModel1.getCallingCodes()) +
@@ -221,7 +226,8 @@ public class WorldDataBot extends TelegramLongPollingBot {
                             "\n\ntimezones: " + Arrays.toString(countryModel1.getTimezones()) +
                             "\n\nnativeName: " + countryModel1.getNativeName() +
                             "\n\nnumericCode: " + countryModel1.getNumericCode() +
-                            "\n\nflag: " + countryModel1.getFlag());
+                            "\n\nflag: " + countryModel1.getFlag();
+                    SendMessage countryInfoMessage = createMessage(textMessage, chatId);
                     send(countryInfoMessage);
                 }
             } catch (JsonProcessingException e) {

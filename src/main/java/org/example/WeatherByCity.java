@@ -3,7 +3,6 @@ package org.example;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Map;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherByCity {
     private Map<String, Object> coord;
@@ -124,6 +123,4 @@ public class WeatherByCity {
     public void setCod(int cod) {
         this.cod = cod;
     }
-
-
 }

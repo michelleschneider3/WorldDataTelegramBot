@@ -40,14 +40,4 @@ public class NasaPictureOfTheDay {
         this.title = title;
     }
 
-
-    @Override
-    public String toString() {
-        return "NasaPictureOfTheDay{" +
-                "date='" + date + '\'' +
-                ", explanation='" + explanation + '\'' +
-                ", hdurl='" + hdurl + '\'' +
-                ", title='" + title + '\'' +
-                '}';
-    }
 }

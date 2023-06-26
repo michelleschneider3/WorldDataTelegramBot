@@ -23,11 +23,4 @@ public class QuoteModel {
         this.author = author;
     }
 
-    @Override
-    public String toString() {
-        return "QuoteModel{" +
-                "content='" + content + '\'' +
-                ", author='" + author + '\'' +
-                '}';
-    }
 }

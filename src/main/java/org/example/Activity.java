@@ -4,7 +4,7 @@ public enum Activity {
     QUOTES("Random Quote"),
     NASA("NASA"),
     COUNTRIES_INFORMATION("Countries information"),
-    UNIVERSITIES("Universities");
+    MAKEUP("Makeup");
 
     private final String activityName;
 

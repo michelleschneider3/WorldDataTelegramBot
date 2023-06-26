@@ -33,10 +33,6 @@ public class User {
         return userName;
     }
 
-    public void setRequests(HashMap<String, Integer> requests) {
-        this.requests = requests;
-    }
-
     public boolean equalsUserByChatId(long chatId) {
         return Objects.equals(this.chatId, chatId);
     }

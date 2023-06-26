@@ -1,7 +1,6 @@
 package org.example;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublicHolidaysByCountry {
     private String date;
@@ -39,15 +38,5 @@ public class PublicHolidaysByCountry {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
-    }
-
-    @Override
-    public String toString() {
-        return "PublicHolidaysByCountry{" +
-                "date='" + date + '\'' +
-                ", localName='" + localName + '\'' +
-                ", name='" + name + '\'' +
-                ", countryCode='" + countryCode + '\'' +
-                '}';
     }
 }

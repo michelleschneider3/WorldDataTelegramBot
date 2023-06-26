@@ -66,10 +66,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
                 SendMessage weatherMessage = createMessage("Write the ISO 3166 code of the country (for example: russia=RU): ", chatId);
                 send(weatherMessage);
             }
-            case NEWS -> {
-                System.out.println("first part 1");
-            }
-            case NASA -> {
+            case QUOTES, NASA -> {
                 secondPartOfRequests(this.chatIds.get(chatId), chatId, null);
             }
             case UNIVERSITIES, COUNTRIES_INFORMATION -> {
@@ -94,8 +91,8 @@ public class WorldDataBot extends TelegramLongPollingBot {
             case PUBLIC_HOLIDAYS -> {
                 this.executorService.submit(() -> handlePublicHolidaysInfoRequest(chatId, text));
             }
-            case NEWS -> {
-                System.out.println("second part 1");
+            case QUOTES -> {
+                this.executorService.submit(() -> handleRandomQuoteRequest(chatId));
             }
             case NASA -> {
                 this.executorService.submit(() -> handleNasaPictureOfTheDayRequest(chatId));
@@ -109,6 +106,29 @@ public class WorldDataBot extends TelegramLongPollingBot {
         }
     }
 
+    private void  handleRandomQuoteRequest (long chatId) {
+        GetRequest getRequest = Unirest.get("https://api.quotable.io/quotes/random");
+        try {
+            HttpResponse<String> response = getRequest.asString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<QuoteModel> quoteModels = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
+                for (QuoteModel quoteModel : quoteModels) {
+                    SendMessage quoteMessage = createMessage("content: " + quoteModel.getContent() +
+                            "\n\nauthor: " + quoteModel.getAuthor(), chatId);
+                    send(quoteMessage);
+                }
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        this.chatIds.remove(chatId);
+
+
+    }
+
     private void handleUniversitiesInfoRequest(long chatId, String text) {
         GetRequest getRequest = Unirest.get("http://universities.hipolabs.com/search?country=" + text);
         try {
@@ -117,12 +137,11 @@ public class WorldDataBot extends TelegramLongPollingBot {
             try {
                 List<UniversityModel> universityModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<UniversityModel>>(){});
                 for (UniversityModel universityModel : universityModelList) {
-                    SendMessage universitiesInfoMessage = new SendMessage();
-                    universitiesInfoMessage.setChatId(chatId);
-                    universitiesInfoMessage.setText("country: " + universityModel.getCountry() +
+                    String textMessage = "country: " + universityModel.getCountry() +
                             "\nalpha two code: " + universityModel.getAlpha_two_code() +
                             "\nName: " + universityModel.getName() +
-                            "\nweb_pages: " + Arrays.toString(universityModel.getWeb_pages()));
+                            "\nweb_pages: " + Arrays.toString(universityModel.getWeb_pages());
+                    SendMessage universitiesInfoMessage = createMessage(textMessage, chatId);
                     send(universitiesInfoMessage);
                 }
             } catch (JsonProcessingException e) {
@@ -146,8 +165,6 @@ public class WorldDataBot extends TelegramLongPollingBot {
                 nasaPictureMessage.setText("date: " + nasaPictureOfTheDay.getDate() +
                         "\n\nexplanation: " + nasaPictureOfTheDay.getExplanation() +
                         "\n\nhdurl: " + nasaPictureOfTheDay.getHdurl() +
-                        "\n\nmedia type: " + nasaPictureOfTheDay.getMedia_type() +
-                        "\n\nservice version: " + nasaPictureOfTheDay.getService_version() +
                         "\n\ntitle: " + nasaPictureOfTheDay.getTitle());
                 send(nasaPictureMessage);
             } catch (JsonProcessingException e) {
@@ -214,7 +231,6 @@ public class WorldDataBot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
         this.chatIds.remove(chatId);
-        // לא לשכוח שבכל כל סוף בקשה למחוק את הצאט ID של המשתמש הזה מהליסט של צאט IDS
     }
 
     private ArrayList<String> makeNewActivityForHistory (String userName, String activityName, String currentMessageDate) {

@@ -1,7 +1,7 @@
 package org.example;
 public enum Activity {
     PUBLIC_HOLIDAYS("Public holidays"),
-    NEWS("News"),
+    QUOTES("Random Quote"),
     NASA("NASA"),
     COUNTRIES_INFORMATION("Countries information"),
     UNIVERSITIES("Universities");

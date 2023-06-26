@@ -1,7 +1,8 @@
 package org.example;
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,8 +11,6 @@ public class BotAdminInterface extends JFrame{
     private WorldDataBot worldDataBot;
     private ArrayList<User> users;
     private ArrayList<ArrayList<String>> activityHistory;
-    private HashMap<LocalDateTime,HashMap<String, Integer>> requestCounts;
-
     public BotAdminInterface(WorldDataBot worldDataBot) {
         this.setSize(Constants.BOT_INTERFACE_WINDOW_WIDTH,Constants.BOT_INTERFACE_WINDOW_HEIGHT);
         this.setLayout(null);
@@ -23,7 +22,6 @@ public class BotAdminInterface extends JFrame{
         this.users = new ArrayList<>();
         this.availableActivities = new ArrayList<>();
         this.activityHistory = new ArrayList<>();
-        this.requestCounts = new HashMap<>();
         this.worldDataBot = worldDataBot;
 
         // Manage Activities
@@ -60,9 +58,6 @@ public class BotAdminInterface extends JFrame{
         activityGraphButton.setBounds(Constants.BOT_INTERFACE_WINDOW_WIDTH/2+(Constants.BOT_INTERFACE_WINDOW_WIDTH/2-Constants.UPDATE_BUTTON_WIDTH)/2, Constants.BOT_INTERFACE_WINDOW_HEIGHT/2 + 9*Constants.MARGIN_FROM_TOP, Constants.UPDATE_BUTTON_WIDTH, Constants.UPDATE_BUTTON_HEIGHT);
         activityGraphButton.setFont(updateButtonFont);
         this.add(activityGraphButton);
-        activityGraphButton.addActionListener(e -> {
-//            new DailyActivityGraphWindow(this.requestCounts);
-        });
 
         this.setVisible(true);
     }
@@ -92,25 +87,6 @@ public class BotAdminInterface extends JFrame{
     }
 
 
-//    public void addRequestToRequestsCount (String date) {
-//        int hour = Integer.parseInt(date.trim().substring(0,1));
-//        for (int i = 0; i < Constants.TIME_RANGES_INTEGER.length; i++) {
-//            if (hour >= Constants.TIME_RANGES_INTEGER[i][1] && hour <= Constants.TIME_RANGES_INTEGER[i][2]) {
-//                LocalDate currentDate = LocalDate.now();
-//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-//                String formattedDate = currentDate.format(formatter);
-//                if ()
-//                HashMap<String, Integer> requestsByDay = requestCounts.get(formatter);
-//                if (this.requestCounts.containsKey(Constants.TIME_RANGES_STRING[i])) {
-//                    int currentValue = this.requestCounts.get(Constants.TIME_RANGES_STRING[i]);
-//                    this.requestCounts.put(Constants.TIME_RANGES_STRING[i], currentValue+1);
-//                } else {
-//                    this.requestCounts.put(Constants.TIME_RANGES_STRING[i], 1);
-//                }
-//            }
-//        }
-//    }
-
     public void findUserAndUpdateTheRequests (String activity, long chatId) {
         for (User user : this.users) {
             if (user.equalsUserByChatId(chatId)) {
@@ -125,6 +101,14 @@ public class BotAdminInterface extends JFrame{
             if (user.getChatId() == chatId) {
                 result = user.getUserName();
             }
+        }
+        return result;
+    }
+
+    public HashMap<String, Integer> createRequestByDayMap () {
+        HashMap<String, Integer> result = new HashMap<>();
+        for (int i = 0; i < Constants.TIME_RANGES_STRING.length; i++) {
+            result.put(Constants.TIME_RANGES_STRING[i], 0);
         }
         return result;
     }

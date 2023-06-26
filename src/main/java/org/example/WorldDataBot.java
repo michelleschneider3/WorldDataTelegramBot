@@ -143,7 +143,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<MakeupProductModel> makeupProductModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<MakeupProductModel>>() {});
-                makeupProductModelList.stream().forEach(makeupProductModel -> {
+                makeupProductModelList.forEach(makeupProductModel -> {
                     String textMessage = "brand: " + makeupProductModel.getBrand() +
                             "\nprice: " + makeupProductModel.getPrice() +
                             "\nName: " + makeupProductModel.getName() +
@@ -190,7 +190,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<PublicHolidaysByCountry> publicHolidaysList = objectMapper.readValue(response.getBody(), new TypeReference<List<PublicHolidaysByCountry>>() {});
-                publicHolidaysList.stream().forEach(publicHoliday -> {
+                publicHolidaysList.forEach(publicHoliday -> {
                     String textMessage = "Date: " + publicHoliday.getDate() +
                             "\nLocal Name: " + publicHoliday.getLocalName() +
                             "\nName: " + publicHoliday.getName() +
@@ -213,7 +213,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<CountryModel> countryModel = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
-                countryModel.stream().forEach(countryModel1 -> {
+                countryModel.forEach(countryModel1 -> {
                     String textMessage = "name: " + countryModel1.getName() +
                             "\n\nalpha2Code: " + countryModel1.getAlpha2Code() +
                             "\n\nalpha3Code: " + countryModel1.getAlpha3Code() +

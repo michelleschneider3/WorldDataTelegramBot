@@ -142,8 +142,8 @@ public class WorldDataBot extends TelegramLongPollingBot {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                List<MakeupProductModel> makeupProductModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<MakeupProductModel>>(){});
-                for (MakeupProductModel makeupProductModel : makeupProductModelList) {
+                List<MakeupProductModel> makeupProductModelList = objectMapper.readValue(response.getBody(), new TypeReference<List<MakeupProductModel>>() {});
+                makeupProductModelList.stream().forEach(makeupProductModel -> {
                     String textMessage = "brand: " + makeupProductModel.getBrand() +
                             "\nprice: " + makeupProductModel.getPrice() +
                             "\nName: " + makeupProductModel.getName() +
@@ -152,7 +152,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
                             "\n\nproduct_link: " + makeupProductModel.getProduct_link();
                     SendMessage makeupInfoMessage = createMessage(textMessage, chatId);
                     send(makeupInfoMessage);
-                }
+                });
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -189,15 +189,15 @@ public class WorldDataBot extends TelegramLongPollingBot {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                List<PublicHolidaysByCountry> publicHolidaysList = objectMapper.readValue(response.getBody(), new TypeReference<List<PublicHolidaysByCountry>>(){});
-                for (PublicHolidaysByCountry publicHoliday : publicHolidaysList) {
+                List<PublicHolidaysByCountry> publicHolidaysList = objectMapper.readValue(response.getBody(), new TypeReference<List<PublicHolidaysByCountry>>() {});
+                publicHolidaysList.stream().forEach(publicHoliday -> {
                     String textMessage = "Date: " + publicHoliday.getDate() +
                             "\nLocal Name: " + publicHoliday.getLocalName() +
                             "\nName: " + publicHoliday.getName() +
                             "\nCountry Code: " + publicHoliday.getCountryCode();
                     SendMessage holidaysInfoMessage = createMessage(textMessage, chatId);
                     send(holidaysInfoMessage);
-                }
+                });
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -213,7 +213,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<CountryModel> countryModel = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
-                for (CountryModel countryModel1 : countryModel) {
+                countryModel.stream().forEach(countryModel1 -> {
                     String textMessage = "name: " + countryModel1.getName() +
                             "\n\nalpha2Code: " + countryModel1.getAlpha2Code() +
                             "\n\nalpha3Code: " + countryModel1.getAlpha3Code() +
@@ -229,7 +229,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
                             "\n\nflag: " + countryModel1.getFlag();
                     SendMessage countryInfoMessage = createMessage(textMessage, chatId);
                     send(countryInfoMessage);
-                }
+                });
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

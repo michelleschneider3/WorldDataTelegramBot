@@ -117,12 +117,12 @@ public class WorldDataBot extends TelegramLongPollingBot {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 List<QuoteModel> quoteModels = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
-                for (QuoteModel quoteModel : quoteModels) {
+                quoteModels.forEach(quoteModel -> {
                     String textMessage = "content: " + quoteModel.getContent() +
                             "\n\nauthor: " + quoteModel.getAuthor();
                     SendMessage quoteMessage = createMessage(textMessage, chatId);
                     send(quoteMessage);
-                }
+                });
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -130,8 +130,6 @@ public class WorldDataBot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
         this.chatIds.remove(chatId);
-
-
     }
 
     private void handleMakeupInfoRequest(long chatId, String text) {

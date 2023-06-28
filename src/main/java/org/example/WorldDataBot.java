@@ -133,7 +133,6 @@ public class WorldDataBot extends TelegramLongPollingBot {
     }
 
     private void handleMakeupInfoRequest(long chatId, String text) {
-        System.out.println("hello");
         String[] brandAndTypeProduct = text.split(",");
         GetRequest getRequest = Unirest.get("http://makeup-api.herokuapp.com/api/v1/products.json?brand=" + brandAndTypeProduct[0].trim() + "&product_type=" + brandAndTypeProduct[1].trim());
         try {

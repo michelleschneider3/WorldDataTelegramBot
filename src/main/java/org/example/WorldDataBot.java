@@ -145,8 +145,8 @@ public class WorldDataBot extends TelegramLongPollingBot {
                             "\nprice: " + makeupProductModel.getPrice() +
                             "\nName: " + makeupProductModel.getName() +
                             "\n\ncategory: " + makeupProductModel.getCategory() +
-                            "\n\nproduct_type: " + makeupProductModel.getProduct_type() +
-                            "\n\nproduct_link: " + makeupProductModel.getProduct_link();
+                            "\n\nproduct type: " + makeupProductModel.getProduct_type() +
+                            "\n\nproduct link: " + makeupProductModel.getProduct_link();
                     SendMessage makeupInfoMessage = createMessage(textMessage, chatId);
                     send(makeupInfoMessage);
                 });

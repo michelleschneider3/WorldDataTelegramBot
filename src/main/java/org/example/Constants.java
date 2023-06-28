@@ -20,4 +20,6 @@ public class Constants {
     public static final int DONE_BUTTON_SIZE = 14;
     public static final String[] ACTIVITIES = {"Public holidays", "Random Quote", "NASA", "Countries information", "Makeup"};
 
+    public static final String[] TIME_RANGES_STRING = {"06:00-11:00" , "12:00-17:00", "18:00-23:00", "00:00-05:00"};
+    public static final int[][] TIME_RANGES_INTEGER = {{6,11}, {12,17}, {18,23}, {0,5}};
 }

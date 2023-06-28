@@ -14,6 +14,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,6 +63,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
         this.botAdminInterface.findUserAndUpdateTheRequests(activity.getActivityName(), chatId);
         ArrayList<String> newActivity = makeNewActivityForHistory(this.botAdminInterface.getUserNameByChatId(chatId), activity.getActivityName(), currentMessageDate);
         this.botAdminInterface.addActivityToHistoryList(newActivity);
+        this.botAdminInterface.addRequestToTotalRequestByDayAndTimeMap(returnTimeOrDate("time"), returnTimeOrDate("date"));
         switch (activity) {
             case PUBLIC_HOLIDAYS -> {
                 SendMessage weatherMessage = createMessage("Write the ISO 3166 code of the country (for example: russia=RU): ", chatId);
@@ -309,5 +312,16 @@ public class WorldDataBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String returnTimeOrDate (String timeOrDate) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter;
+        if (timeOrDate.equals("time")) {
+            formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        } else {
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        }
+        return currentDateTime.format(formatter);
     }
 }

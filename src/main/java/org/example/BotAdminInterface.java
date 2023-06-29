@@ -83,34 +83,27 @@ public class BotAdminInterface extends JFrame{
     }
 
     public void addNewUser (User newUser) {
-        boolean result = true;
-        for (User user : this.users) {
-            if (newUser.getUserName().equals(user.getUserName())) {
-                result = false;
-            }
-        }
-        if (result) {
+        boolean userExists = this.users.stream()
+                .anyMatch(user -> newUser.getUserName().equals(user.getUserName()));
+
+        if (!userExists) {
             this.users.add(newUser);
         }
     }
 
 
     public void findUserAndUpdateTheRequests (String activity, long chatId) {
-        for (User user : this.users) {
-            if (user.equalsUserByChatId(chatId)) {
-                user.updateRequests(activity);
-            }
-        }
+        this.users.stream()
+                .filter(user -> user.equalsUserByChatId(chatId))
+                .forEach(user -> user.updateRequests(activity));
     }
 
     public String getUserNameByChatId (long chatId) {
-        String result = "";
-        for (User user : this.users) {
-            if (user.getChatId() == chatId) {
-                result = user.getUserName();
-            }
-        }
-        return result;
+        return this.users.stream()
+                .filter(user -> user.getChatId() == chatId)
+                .map(User::getUserName)
+                .findFirst()
+                .orElse("");
     }
 
     public void addRequestToTotalRequestByDayAndTimeMap (String hour, String date) { //(HH:mm:ss,yyyy-MM-dd)

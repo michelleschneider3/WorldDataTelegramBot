@@ -31,4 +31,5 @@ public class Constants {
     public static final String URL_NASA = "https://api.nasa.gov/planetary/apod?api_key=mglHbNmXB8rG1E7GcXUqKFlorMXcL3qgirT7DLGZ";
     public static final String URL_HOLIDAYS = "https://date.nager.at/api/v2/publicholidays/2023/";
     public static final String URL_COUNTRIES = "https://restcountries.com/v2/name/";
+    public static final String INITIAL_URL_CHARTS = "https://quickchart.io/chart?c={type:'bar',data:{labels:[";
 }

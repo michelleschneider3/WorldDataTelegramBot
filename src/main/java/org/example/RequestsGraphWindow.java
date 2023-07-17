@@ -27,7 +27,7 @@ public class RequestsGraphWindow extends JFrame {
             }
         }
 
-        String url = "https://quickchart.io/chart?c={type:'bar',data:{labels:[";
+        String url = Constants.INITIAL_URL_CHARTS;
         for (int i = 0; i < Constants.TIME_RANGES_STRING.length; i++) {
             if (i<Constants.TIME_RANGES_STRING.length-1) {
                 url += "'" + Constants.TIME_RANGES_STRING[i] + "',";

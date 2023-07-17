@@ -107,7 +107,7 @@ public class BotAdminInterface extends JFrame{
     }
 
     public void addRequestToTotalRequestByDayAndTimeMap (String hour, String date) { //(HH:mm:ss,yyyy-MM-dd)
-        int requestHour = Integer.parseInt(hour.substring(0,1));
+        int requestHour = Integer.parseInt(hour.substring(0,2));
         if (this.totalRequestByDayAndTime.containsKey(date)) {
             addToRequestByTime(requestHour, date);
         } else {

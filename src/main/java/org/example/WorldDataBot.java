@@ -69,9 +69,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
                 SendMessage weatherMessage = createMessage("Write the ISO 3166 code of the country (for example: russia=RU): ", chatId);
                 send(weatherMessage);
             }
-            case QUOTES, NASA -> {
-                secondPartOfRequests(this.chatIds.get(chatId), chatId, null);
-            }
+            case QUOTES, NASA -> secondPartOfRequests(this.chatIds.get(chatId), chatId, null);
             case MAKEUP -> {
                 SendMessage makeupMessage = createMessage("write the name of the brand and type product: \n\nfor example: dior,foundation" , chatId);
                 send(makeupMessage);
@@ -95,26 +93,16 @@ public class WorldDataBot extends TelegramLongPollingBot {
         Activity activity = Activity.getActivityFromRequest(request);
 
         switch (Objects.requireNonNull(activity)) {
-            case PUBLIC_HOLIDAYS -> {
-                this.executorService.submit(() -> handlePublicHolidaysInfoRequest(chatId, text));
-            }
-            case QUOTES -> {
-                this.executorService.submit(() -> handleRandomQuoteRequest(chatId));
-            }
-            case NASA -> {
-                this.executorService.submit(() -> handleNasaPictureOfTheDayRequest(chatId));
-            }
-            case MAKEUP -> {
-                this.executorService.submit(() -> handleMakeupInfoRequest(chatId, text));
-            }
-            case COUNTRIES_INFORMATION -> {
-                this.executorService.submit(() -> handleCountriesInfoRequest(chatId, text));
-            }
+            case PUBLIC_HOLIDAYS -> this.executorService.submit(() -> handlePublicHolidaysInfoRequest(chatId, text));
+            case QUOTES -> this.executorService.submit(() -> handleRandomQuoteRequest(chatId));
+            case NASA -> this.executorService.submit(() -> handleNasaPictureOfTheDayRequest(chatId));
+            case MAKEUP -> this.executorService.submit(() -> handleMakeupInfoRequest(chatId, text));
+            case COUNTRIES_INFORMATION -> this.executorService.submit(() -> handleCountriesInfoRequest(chatId, text));
         }
     }
 
     private void  handleRandomQuoteRequest (long chatId) {
-        GetRequest getRequest = Unirest.get("https://api.quotable.io/quotes/random");
+        GetRequest getRequest = Unirest.get(Constants.URL_QUOTE);
         try {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -137,7 +125,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
 
     private void handleMakeupInfoRequest(long chatId, String text) {
         String[] brandAndTypeProduct = text.split(",");
-        GetRequest getRequest = Unirest.get("http://makeup-api.herokuapp.com/api/v1/products.json?brand=" + brandAndTypeProduct[0].trim() + "&product_type=" + brandAndTypeProduct[1].trim());
+        GetRequest getRequest = Unirest.get(Constants.URL_MAKEUP + brandAndTypeProduct[0].trim() + "&product_type=" + brandAndTypeProduct[1].trim());
         try {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -163,7 +151,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
     }
 
     private void handleNasaPictureOfTheDayRequest (long chatId) {
-        GetRequest getRequest = Unirest.get("https://api.nasa.gov/planetary/apod?api_key=mglHbNmXB8rG1E7GcXUqKFlorMXcL3qgirT7DLGZ");
+        GetRequest getRequest = Unirest.get(Constants.URL_NASA);
         try {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -184,7 +172,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
         this.chatIds.remove(chatId);
     }
     private void handlePublicHolidaysInfoRequest(long chatId, String ISOCode) {
-        GetRequest getRequest = Unirest.get("https://date.nager.at/api/v2/publicholidays/2023/" + ISOCode);
+        GetRequest getRequest = Unirest.get(Constants.URL_HOLIDAYS + ISOCode);
         try {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -207,7 +195,7 @@ public class WorldDataBot extends TelegramLongPollingBot {
         this.chatIds.remove(chatId);
     }
     private void handleCountriesInfoRequest(long chatId, String country) {
-        GetRequest getRequest = Unirest.get("https://restcountries.com/v2/name/" + country);
+        GetRequest getRequest = Unirest.get(Constants.URL_COUNTRIES + country);
         try {
             HttpResponse<String> response = getRequest.asString();
             ObjectMapper objectMapper = new ObjectMapper();

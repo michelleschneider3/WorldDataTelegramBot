@@ -22,4 +22,13 @@ public class Constants {
 
     public static final String[] TIME_RANGES_STRING = {"06:00-11:00" , "12:00-17:00", "18:00-23:00", "00:00-05:00"};
     public static final int[][] TIME_RANGES_INTEGER = {{6,11}, {12,17}, {18,23}, {0,5}};
+
+    public static final int REQUESTS_GRAPH_WINDOW_WIDTH = 750;
+    public static final int REQUESTS_GRAPH_WINDOW_HEIGHT = 550;
+
+    public static final String URL_QUOTE = "https://api.quotable.io/quotes/random";
+    public static final String URL_MAKEUP = "http://makeup-api.herokuapp.com/api/v1/products.json?brand=";
+    public static final String URL_NASA = "https://api.nasa.gov/planetary/apod?api_key=mglHbNmXB8rG1E7GcXUqKFlorMXcL3qgirT7DLGZ";
+    public static final String URL_HOLIDAYS = "https://date.nager.at/api/v2/publicholidays/2023/";
+    public static final String URL_COUNTRIES = "https://restcountries.com/v2/name/";
 }
